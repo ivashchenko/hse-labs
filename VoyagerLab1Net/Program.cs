@@ -42,7 +42,7 @@ namespace VoyagerLab1Net
         static void Main(string[] args)
         {
             Point[] points =
-                File.ReadAllLines("../../../tests/test_15.csv")
+                File.ReadAllLines("../../../tests/test_14.csv")
                 .Select(a => a.Split(';'))
                 .Select(xy => new Point
                 {
@@ -86,6 +86,8 @@ namespace VoyagerLab1Net
 
                                 if (distance > _minPath && i < tail.Length - 3)
                                 {
+                                    // дальшнейшие перестановки tail - бесполезны
+                                    // изменим tail так, чтобы на след шаге tail[i-1] стал на 1 больше
                                     Array.Sort(tail, i, tail.Length - i, new ReverseComparer());
                                     break;
                                 }

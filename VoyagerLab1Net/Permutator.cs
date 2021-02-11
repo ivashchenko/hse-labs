@@ -22,19 +22,12 @@ namespace VoyagerLab1Net
             {
                 for (int i = l; i < Array.Length; i++)
                 {
-                    Swap(l, i);
+                    (Array[l], Array[i]) = (Array[i], Array[l]);
                     foreach (var _ in Next(l + 1))
                         yield return 1;
-                    Swap(l, i);
+                    (Array[l], Array[i]) = (Array[i], Array[l]);
                 }
             }
-        }
-
-        void Swap(int i, int j)
-        {
-            int tmp = Array[i];
-            Array[i] = Array[j];
-            Array[j] = tmp;
         }
     }
 }
