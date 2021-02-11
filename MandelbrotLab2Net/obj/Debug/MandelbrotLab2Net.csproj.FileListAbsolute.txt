@@ -1,0 +1,10 @@
+D:\GitHub\hse-labs\MandelbrotLab2Net\bin\Debug\MandelbrotLab2Net.exe.config
+D:\GitHub\hse-labs\MandelbrotLab2Net\bin\Debug\MandelbrotLab2Net.exe
+D:\GitHub\hse-labs\MandelbrotLab2Net\bin\Debug\MandelbrotLab2Net.pdb
+D:\GitHub\hse-labs\MandelbrotLab2Net\obj\Debug\MandelbrotLab2Net.csprojAssemblyReference.cache
+D:\GitHub\hse-labs\MandelbrotLab2Net\obj\Debug\MandelbrotLab2Net.Properties.Resources.resources
+D:\GitHub\hse-labs\MandelbrotLab2Net\obj\Debug\MandelbrotLab2Net.csproj.GenerateResource.cache
+D:\GitHub\hse-labs\MandelbrotLab2Net\obj\Debug\MandelbrotLab2Net.csproj.CoreCompileInputs.cache
+D:\GitHub\hse-labs\MandelbrotLab2Net\obj\Debug\MandelbrotLab2Net.exe
+D:\GitHub\hse-labs\MandelbrotLab2Net\obj\Debug\MandelbrotLab2Net.pdb
+D:\GitHub\hse-labs\MandelbrotLab2Net\obj\Debug\MandelbrotLab2Net.Complex.resources

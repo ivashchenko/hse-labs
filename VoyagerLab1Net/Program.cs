@@ -42,7 +42,7 @@ namespace VoyagerLab1Net
         static void Main(string[] args)
         {
             Point[] points =
-                File.ReadAllLines("../../../tests/test_14.csv")
+                File.ReadAllLines("../../../tests/test_15.csv")
                 .Select(a => a.Split(';'))
                 .Select(xy => new Point
                 {
@@ -66,29 +66,24 @@ namespace VoyagerLab1Net
                 for (int n = 0; n < N; n++)
                 {
                     int[] nodes = Enumerable.Range(0, N).ToArray();
-                    int[] tail = nodes.Skip(1).ToArray();
-
-                    int first = nodes[n];
-                    nodes[n] = nodes[0];
-                    nodes[0] = first;
+                    (nodes[n], nodes[0]) = (nodes[0], nodes[n]);
 
                     tasks.Add(Task.Run(() =>
                     {
                         var result = new AlgorithmResult { Distance = double.MaxValue, Points = nodes.Clone() as int[] };
                         do
                         {
-                            double distance = DM[first, tail[0]];
-                            for (int i = 0; i < tail.Length; i++)
+                            double distance = DM[nodes[0], nodes[1]];
+                            for (int i = 1; i < nodes.Length; i++)
                             {
-                                distance += (i < tail.Length - 1) ?
-                                    DM[tail[i], tail[i + 1]] :
-                                    DM[tail[i], first]; // возврат в первую точку
+                                distance += (i < nodes.Length - 1) ?
+                                    DM[nodes[i], nodes[i + 1]] :
+                                    DM[nodes[i], nodes[0]]; // возврат в первую точку
 
-                                if (distance > _minPath && i < tail.Length - 3)
+                                if (distance > _minPath && i < nodes.Length - 3)
                                 {
-                                    // дальшнейшие перестановки tail - бесполезны
-                                    // изменим tail так, чтобы на след шаге tail[i-1] стал на 1 больше
-                                    Array.Sort(tail, i, tail.Length - i, new ReverseComparer());
+                                    // дальнейшие перестановки nodes - бесполезны
+                                    Array.Sort(nodes, i, nodes.Length - i, new ReverseComparer());
                                     break;
                                 }
                             }
@@ -96,13 +91,13 @@ namespace VoyagerLab1Net
                             if (distance <= result.Distance)
                             {
                                 result.Distance = distance;
-                                tail.CopyTo(result.Points, 1);
+                                nodes.CopyTo(result.Points, 0);
 
                                 // обновить минимальную длину
                                 if (distance < _minPath)
                                     Interlocked.Exchange(ref _minPath, distance);
                             }
-                        } while (!NextPermutation<int>(tail));
+                        } while (!NextPermutation<int>(nodes, 1));
                         return result;
                     }));
 
@@ -118,8 +113,7 @@ namespace VoyagerLab1Net
             }
         }
 
-        // из интернета
-        public static bool NextPermutation<T>(T[] elements) where T : IComparable<T>
+        public static bool NextPermutation<T>(T[] elements, int skip=0) where T : IComparable<T>
         {
             // More efficient to have a variable instead of accessing a property
             var count = elements.Length;
@@ -128,7 +122,7 @@ namespace VoyagerLab1Net
             var done = true;
 
             // Go through the array from last to first
-            for (var i = count - 1; i > 0; i--)
+            for (var i = count - 1; i > skip; i--)
             {
                 var curr = elements[i];
 
