@@ -42,7 +42,7 @@ namespace VoyagerLab1Net
         static void Main(string[] args)
         {
             Point[] points =
-                File.ReadAllLines("../../../tests/test_15.csv")
+                File.ReadAllLines("../../../tests/test_16.csv")
                 .Select(a => a.Split(';'))
                 .Select(xy => new Point
                 {
@@ -58,23 +58,25 @@ namespace VoyagerLab1Net
                 for (int j = i + 1; j < N; j++)
                     DM[j, i] = DM[i, j] = points[i].Distance(points[j]);
 
+            //MaxThreads = 1;
             Stopwatch sw = new Stopwatch();
-            while (MaxThreads-- > 1)
+            do
             {
                 sw.Start();
                 var tasks = new List<Task<AlgorithmResult>>();
-                for (int n = 0; n < N; n++)
+                for (int n = 1; n < N; n++)
                 {
                     int[] nodes = Enumerable.Range(0, N).ToArray();
-                    (nodes[n], nodes[0]) = (nodes[0], nodes[n]);
+                    (nodes[n], nodes[1]) = (nodes[1], nodes[n]);
+                    Array.Sort(nodes, 2, nodes.Length - 2);
 
                     tasks.Add(Task.Run(() =>
                     {
                         var result = new AlgorithmResult { Distance = double.MaxValue, Points = nodes.Clone() as int[] };
                         do
                         {
-                            double distance = DM[nodes[0], nodes[1]];
-                            for (int i = 1; i < nodes.Length; i++)
+                            double distance = DM[nodes[0], nodes[1]] + DM[nodes[1], nodes[2]];
+                            for (int i = 2; i < nodes.Length; i++)
                             {
                                 distance += (i < nodes.Length - 1) ?
                                     DM[nodes[i], nodes[i + 1]] :
@@ -88,72 +90,47 @@ namespace VoyagerLab1Net
                                 }
                             }
 
-                            if (distance <= result.Distance)
+                            if (distance < result.Distance)
                             {
                                 result.Distance = distance;
                                 nodes.CopyTo(result.Points, 0);
 
-                                // обновить минимальную длину
                                 if (distance < _minPath)
                                     Interlocked.Exchange(ref _minPath, distance);
                             }
-                        } while (!NextPermutation<int>(nodes, 1));
+                        } while (!NextPermutation<int>(nodes, 2));
                         return result;
                     }));
 
-                    if ((tasks.Count % MaxThreads == 0) || tasks.Count == N)
+                    if ((tasks.Count % MaxThreads == 0) || tasks.Count == (N-1))
                         Task.WaitAll(
                             tasks.Where(t => t.Status != TaskStatus.RanToCompletion).ToArray());
                 }
                 sw.Stop();
-                Console.WriteLine($"Threads: {MaxThreads}, time {sw.ElapsedMilliseconds} ms");
 
                 var min = tasks.First(t => t.Result.Distance == tasks.Min(t => t.Result.Distance));
-                Console.WriteLine($"{min.Result.Distance} X={string.Join(",", min.Result.Points)}");
-            }
+                Console.WriteLine($"Threads: {MaxThreads}, {sw.ElapsedMilliseconds}ms, Min: {min.Result.Distance} path={string.Join(",", min.Result.Points)}");
+            } while (--MaxThreads > 0);
         }
 
         public static bool NextPermutation<T>(T[] elements, int skip=0) where T : IComparable<T>
         {
-            // More efficient to have a variable instead of accessing a property
             var count = elements.Length;
-
-            // Indicates whether this is the last lexicographic permutation
             var done = true;
 
-            // Go through the array from last to first
             for (var i = count - 1; i > skip; i--)
             {
                 var curr = elements[i];
-
-                // Check if the current element is less than the one before it
                 if (curr.CompareTo(elements[i - 1]) < 0)
-                {
                     continue;
-                }
 
-                // An element bigger than the one before it has been found,
-                // so this isn't the last lexicographic permutation.
                 done = false;
-
-                // Save the previous (bigger) element in a variable for more efficiency.
                 var prev = elements[i - 1];
-
-                // Have a variable to hold the index of the element to swap
-                // with the previous element (the to-swap element would be
-                // the smallest element that comes after the previous element
-                // and is bigger than the previous element), initializing it
-                // as the current index of the current item (curr).
                 var currIndex = i;
 
-                // Go through the array from the element after the current one to last
                 for (var j = i + 1; j < count; j++)
                 {
-                    // Save into variable for more efficiency
                     var tmp = elements[j];
-
-                    // Check if tmp suits the "next swap" conditions:
-                    // Smallest, but bigger than the "prev" element
                     if (tmp.CompareTo(curr) < 0 && tmp.CompareTo(prev) > 0)
                     {
                         curr = tmp;
@@ -161,28 +138,18 @@ namespace VoyagerLab1Net
                     }
                 }
 
-                // Swap the "prev" with the new "curr" (the swap-with element)
                 elements[currIndex] = prev;
                 elements[i - 1] = curr;
 
-                // Reverse the order of the tail, in order to reset it's lexicographic order
                 for (var j = count - 1; j > i; j--, i++)
                 {
                     var tmp = elements[j];
                     elements[j] = elements[i];
                     elements[i] = tmp;
                 }
-
-                // Break since we have got the next permutation
-                // The reason to have all the logic inside the loop is
-                // to prevent the need of an extra variable indicating "i" when
-                // the next needed swap is found (moving "i" outside the loop is a
-                // bad practice, and isn't very readable, so I preferred not doing
-                // that as well).
                 break;
             }
 
-            // Return whether this has been the last lexicographic permutation.
             return done;
         }
     }
