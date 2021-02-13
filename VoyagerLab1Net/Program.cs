@@ -42,7 +42,7 @@ namespace VoyagerLab1Net
         static void Main(string[] args)
         {
             Point[] points =
-                File.ReadAllLines("../../../tests/test_16.csv")
+                File.ReadAllLines("../../../tests/test_10.csv")
                 .Select(a => a.Split(';'))
                 .Select(xy => new Point
                 {
