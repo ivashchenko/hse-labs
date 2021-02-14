@@ -12,10 +12,10 @@ namespace MandelbrotLab2Net
 {
     public class Complex
     {
-        public float Re { get; private set; }
-        public float Im { get; private set; }
+        public double Re { get; private set; }
+        public double Im { get; private set; }
 
-        public Complex(float re = 0, float im = 0)
+        public Complex(double re = 0, double im = 0)
         {
             Re = re;
             Im = im;
@@ -24,6 +24,11 @@ namespace MandelbrotLab2Net
         public float Module()
         {
             return (float)Math.Sqrt(Re * Re + Im * Im);
+        }
+        
+        public double Module2()
+        {
+            return Re * Re + Im * Im;
         }
 
         public static Complex operator +(Complex c1, Complex c2)

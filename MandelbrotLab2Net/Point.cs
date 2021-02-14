@@ -8,24 +8,24 @@ namespace MandelbrotLab2Net
 {
     public struct Point
     {
-        public float X { get; set; }
-        public float Y { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
 
-        public Point(float x, float y)
+        public Point(double x, double y)
         {
             X = x;
             Y = y;
         }
 
-        public bool IsMandelbrot(int depth = 100)
+        public int Mandelbrot(int depth = 255)
         {
             int i = 0;
             Complex c = new Complex(X, Y), z = new Complex();
-            for (; i < depth && z.Module() < 2f; i++)
+            for (; depth > 0 && z.Module2() < 4f; i++, depth--)
             {
                 z = z * z + c;
             }
-            return i == depth;
+            return i;
         }
     }
 }
