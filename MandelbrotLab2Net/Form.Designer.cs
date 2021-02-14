@@ -40,6 +40,7 @@ namespace MandelbrotLab2Net
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox.BackColor = System.Drawing.SystemColors.ControlLight;
             this.pictureBox.Location = new System.Drawing.Point(12, 12);
+            this.pictureBox.Margin = new System.Windows.Forms.Padding(2);
             this.pictureBox.Name = "pictureBox";
             this.pictureBox.Size = new System.Drawing.Size(454, 278);
             this.pictureBox.TabIndex = 0;

@@ -7,4 +7,4 @@ D:\GitHub\hse-labs\MandelbrotLab2Net\obj\Debug\MandelbrotLab2Net.csproj.Generate
 D:\GitHub\hse-labs\MandelbrotLab2Net\obj\Debug\MandelbrotLab2Net.csproj.CoreCompileInputs.cache
 D:\GitHub\hse-labs\MandelbrotLab2Net\obj\Debug\MandelbrotLab2Net.exe
 D:\GitHub\hse-labs\MandelbrotLab2Net\obj\Debug\MandelbrotLab2Net.pdb
-D:\GitHub\hse-labs\MandelbrotLab2Net\obj\Debug\MandelbrotLab2Net.Complex.resources
+D:\GitHub\hse-labs\MandelbrotLab2Net\obj\Debug\MandelbrotLab2Net.Form.resources
