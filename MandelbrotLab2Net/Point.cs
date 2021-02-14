@@ -10,5 +10,22 @@ namespace MandelbrotLab2Net
     {
         public float X { get; set; }
         public float Y { get; set; }
+
+        public Point(float x, float y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        public bool IsMandelbrot(int depth = 100)
+        {
+            int i = 0;
+            Complex c = new Complex(X, Y), z = new Complex();
+            for (; i < depth && z.Module() < 2f; i++)
+            {
+                z = z * z + c;
+            }
+            return i == depth;
+        }
     }
 }

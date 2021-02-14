@@ -8,7 +8,7 @@ namespace MandelbrotLab2Net
 {
     public partial class Form : System.Windows.Forms.Form
     {
-        Bitmap _drawArea;
+        Bitmap _bitmap;
         float K = 3f/300;    // scale
         Point C;           // center 0,0
 
@@ -17,15 +17,65 @@ namespace MandelbrotLab2Net
             return new Point { X = C.X + x / K, Y = C.Y - y / K };
         }
 
+        Point fromCanvasXY(float X, float Y)
+        {
+            return new Point { X = (X - C.X) * K, Y = (C.Y - Y) * K };
+        }
+
         private void Form_Paint(object sender, PaintEventArgs e)
         {
-            if (this.pictureBox.Image == null) return;
+            if (this.pictureBox.Image == null)
+            {
+                if (this.pictureBox.Width > 0 && this.pictureBox.Height > 0)
+                {
+                    _bitmap = new Bitmap(this.pictureBox.Width, this.pictureBox.Height, PixelFormat.Format32bppArgb);
+                    this.pictureBox.Image = _bitmap;
+                }
+                else
+                    return;
+            }
 
-            Graphics g = Graphics.FromImage(_drawArea);
+            Graphics g = Graphics.FromImage(_bitmap);
+
             Pen mypen = new Pen(Brushes.Black, 3);
             Pen penCirle = new Pen(Brushes.Blue, 1), penZero = new Pen(Brushes.Red, 2); ;
             g.Clear(Color.White);
             //g.DrawLine(mypen, 0, 0, 200, 200);
+
+            /*
+            for (int j = 0; j < _bitmap.Height; j++)
+                for (int i = 0; i < _bitmap.Width; i++)
+                    _bitmap.SetPixel(i, j, Color.BlueViolet);
+            */
+
+            BitmapData bmd = _bitmap.LockBits(new Rectangle(0, 0, _bitmap.Width, _bitmap.Height),
+                                  System.Drawing.Imaging.ImageLockMode.ReadWrite,
+                                  _bitmap.PixelFormat);
+
+            int PixelSize = 4;
+            unsafe
+            {
+                for (int y = 0; y < bmd.Height; y++)
+                {
+                    byte* row = (byte*)bmd.Scan0 + (y * bmd.Stride);
+
+                    for (int x = 0; x < bmd.Width; x++)
+                    {
+                        Point pt = fromCanvasXY(x, y);
+                        byte b = 255;
+                        if (pt.IsMandelbrot()) 
+                            b = 0;
+
+                        row[x * PixelSize] = b;   //Blue  0-255
+                        row[x * PixelSize + 1] = b; //Green 0-255
+                        row[x * PixelSize + 2] = b;   //Red   0-255
+                        row[x * PixelSize + 3] = 200;  //Alpha 0-255
+                    }
+                }
+            }
+
+            _bitmap.UnlockBits(bmd);
+
             float W = this.pictureBox.Width, H = this.pictureBox.Height;
 
             float xmin = -C.X * K, xmax = (W - C.X) * K;
@@ -37,19 +87,11 @@ namespace MandelbrotLab2Net
                     Point pt = toCanvasXY(x, y);
                     g.DrawEllipse(x == 0 && y == 0 ? penZero : penCirle, pt.X - 2, pt.Y - 2, 4, 4);
                 }
+            Point pt1 = fromCanvasXY(0, 0), pt2 = fromCanvasXY(W, H);
 
+            g.DrawString($"{pt1.X} - {pt1.Y}", DefaultFont, Brushes.Green, new PointF(0, 0));
+            g.DrawString($"{pt2.X} - {pt2.Y}", DefaultFont, Brushes.Green, new PointF(W-50, H-20));
             g.Dispose();
-        }
-
-        private Bitmap CreateRandomBitmap(int width, int height)
-        {
-            var randomPixels = new byte[4 * width * height];
-            new Random().NextBytes(randomPixels);
-            var gch = GCHandle.Alloc(randomPixels, GCHandleType.Pinned);
-            IntPtr dataPtr = gch.AddrOfPinnedObject();
-            var randomBmp = new Bitmap(width, height, width * 4, PixelFormat.Format32bppArgb, dataPtr);
-            gch.Free();
-            return randomBmp;
         }
 
         public Form()
@@ -66,11 +108,8 @@ namespace MandelbrotLab2Net
         private void OnResize(object sender, EventArgs e)
         {
             this.Text = $"{counter++} {this.pictureBox.Width} {this.pictureBox.Height}";
-            if (this.pictureBox.Width > 0 && this.pictureBox.Height > 0)
-            {
-                _drawArea = CreateRandomBitmap(this.pictureBox.Width, this.pictureBox.Height);
-                this.pictureBox.Image = _drawArea;
-            }
+            this.pictureBox.Image = null;
+            //this.Invalidate(true);
         }
 
         private void PictureBox_MouseWheel(object sender, MouseEventArgs e)

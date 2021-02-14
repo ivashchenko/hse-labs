@@ -15,7 +15,7 @@ namespace MandelbrotLab2Net
         public float Re { get; private set; }
         public float Im { get; private set; }
 
-        public Complex(float re, float im)
+        public Complex(float re = 0, float im = 0)
         {
             Re = re;
             Im = im;

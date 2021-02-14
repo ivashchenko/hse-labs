@@ -42,7 +42,7 @@ namespace MandelbrotLab2Net
             this.pictureBox.Location = new System.Drawing.Point(12, 12);
             this.pictureBox.Margin = new System.Windows.Forms.Padding(2);
             this.pictureBox.Name = "pictureBox";
-            this.pictureBox.Size = new System.Drawing.Size(454, 278);
+            this.pictureBox.Size = new System.Drawing.Size(760, 537);
             this.pictureBox.TabIndex = 0;
             this.pictureBox.TabStop = false;
             // 
@@ -50,7 +50,7 @@ namespace MandelbrotLab2Net
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(478, 302);
+            this.ClientSize = new System.Drawing.Size(784, 561);
             this.Controls.Add(this.pictureBox);
             this.Name = "Form";
             this.Text = "Form";
