@@ -27,5 +27,16 @@ namespace MandelbrotLab2Net
             }
             return i;
         }
+
+        public int Zhulia(int depth = 255)
+        {
+            int i = 0;
+            Complex z = new Complex(X, Y), one = new Complex(1, 0);
+            for (; depth > 0 && z.Module2() < 4f; i++, depth--)
+            {
+                z = z * z - one ;
+            }
+            return i;
+        }
     }
 }

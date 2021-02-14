@@ -36,6 +36,11 @@ namespace MandelbrotLab2Net
             return new Complex(c1.Re + c2.Re, c1.Im + c2.Im);
         }
 
+        public static Complex operator -(Complex c1, Complex c2)
+        {
+            return new Complex(c1.Re - c2.Re, c1.Im - c2.Im);
+        }
+
         public static Complex operator *(Complex c1, Complex c2)
         {
             return new Complex(c1.Re * c2.Re - c1.Im * c2.Im, c1.Re * c2.Im + c1.Im * c2.Re);

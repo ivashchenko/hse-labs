@@ -32,7 +32,7 @@ namespace MandelbrotLab2Net
             int g = (int)(15 * (1 - t) * (1 - t) * t * t * 255);
             int b = (int)(8.5 * (1 - t) * (1 - t) * (1 - t) * t * 255);
             return Color.FromArgb(r, g, b);
-         }
+        }
 
         private void Form_Paint(object sender, PaintEventArgs e)
         {
@@ -40,6 +40,7 @@ namespace MandelbrotLab2Net
                 bitmap = new Bitmap(e.ClipRectangle.Width, e.ClipRectangle.Height, PixelFormat.Format24bppRgb);
 
             float W = bitmap.Width, H = bitmap.Height;
+            bool inverse = checkBoxInverse.Checked;
 
             unsafe
             {
@@ -57,11 +58,20 @@ namespace MandelbrotLab2Net
                     {
                         Point pt = fromCanvasXY(x, y);
 
-                        int id = pt.Mandelbrot(150);
+                        int id = pt.Mandelbrot(255);
+                        //int id = pt.Zhulia(255);
+                        /*
                         Color c = get_rgb_smooth(id, 150);
                         currentLine[_x] = c.B;
                         currentLine[_x + 1] = c.G;
                         currentLine[_x + 2] = c.R;
+                        */
+                        if (inverse) id = 255 - id;
+
+                        double t = (double)id / 255;
+                        currentLine[_x + 2] = (byte)(9 * (1 - t) * t * t * t * 255);
+                        currentLine[_x + 1] = (byte)(15 * (1 - t) * (1 - t) * t * t * 255);
+                        currentLine[_x] = (byte)(8.5 * (1 - t) * (1 - t) * (1 - t) * t * 255);
                     }
                 });
                 bitmap.UnlockBits(bitmapData);
@@ -77,8 +87,8 @@ namespace MandelbrotLab2Net
                         e.Graphics.FillRectangle(x == 0 && y == 0 ? Brushes.Red : Brushes.Yellow, (float)pt.X - 1, (float)pt.Y - 1, 3, 3);
                     }
 
+            //e.Graphics.DrawString($"Увеличение {K}", SystemFonts.DefaultFont, Brushes.LightYellow, 10, 10);
             e.Graphics.Dispose();
-            this.Text = $"Увеличение {1.0 / K} ";
         }
 
         public Form()
@@ -110,6 +120,11 @@ namespace MandelbrotLab2Net
         {
             K = 1.0 / 128.0;
             C = new Point { X = this.Width * 0.75f, Y = this.Height / 2f };
+            this.Invalidate(true);
+        }
+
+        private void checkBoxInverse_CheckedChanged(object sender, EventArgs e)
+        {
             this.Invalidate(true);
         }
     }
