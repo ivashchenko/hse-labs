@@ -1,3 +1,26 @@
+% part 4 - my signal
+T = 1/10000;  % 0.1 мс
+t = 0:T:100*T;
+f = sin(2*pi*500*t) + sin(2*pi*1000*t)/2;
+plot(t,f);
+
+Ck = zeros(size(t));
+N = length(t);
+% реализуем ДПФ "самостоятельно" ;)
+for k = 1: N
+  for i = 1: N
+    Ck(k) = Ck(k) + f(i)*exp(-j*2*pi*k*i/N);
+  end
+  Ck(k) = Ck(k) / N;
+end
+
+Ck = fftshift(Ck)
+
+f = [-(N-1)/2:(N-1)/2] ./ max(t);
+%f = [0:N-1] ./ max(t);
+plot(f, abs(Ck));
+return
+
 % program is improved 14.02.2011 by L.V. Zotov
 clear;
 
