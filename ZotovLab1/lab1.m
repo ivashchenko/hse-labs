@@ -16,7 +16,7 @@ end
 
 Ck = fftshift(Ck)
 
-f = [-(N-1)/2:(N-1)/2] ./ max(t);
+f = [-N/2+1:N/2] ./ max(t);
 %f = [0:N-1] ./ max(t);
 plot(f, abs(Ck));
 return
