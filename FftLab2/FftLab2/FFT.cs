@@ -47,44 +47,44 @@ namespace FftLab2
             return X;
         }
 
-        public static Task<Complex[]> pfft(Complex[] x)
+        public static Complex[] pfft(Complex[] x, byte type = 0)
         {
-            return Task.Run(() => {
-                //Console.WriteLine($"{x.Length}");
-                Complex[] X;
-                int N = x.Length;
-                if (N == 2)
-                {
-                    X = new Complex[2];
-                    X[0] = x[0] + x[1];
-                    X[1] = x[0] - x[1];
-                }
-                else
-                {
-                    Complex[] x_even = new Complex[N / 2];
-                    Complex[] x_odd = new Complex[N / 2];
-                    for (int i = 0; i < N / 2; i++)
-                    {
-                        x_even[i] = x[2 * i];
-                        x_odd[i] = x[2 * i + 1];
-                    }
-                    
-                    var taskEven = pfft(x_even);
-                    var taskOdd = pfft(x_odd);
-                    Task.WaitAll(taskEven, taskOdd);
-                    Complex[] X_even = taskEven.Result;
-                    Complex[] X_odd = taskOdd.Result;
+            Complex[] X;
+            int N = x.Length;
 
-                    X = new Complex[N];
-                    for (int i = 0; i < N / 2; i++)
-                    {
-                        X[i] = X_even[i] + w(i, N) * X_odd[i];
-                        X[i + N / 2] = X_even[i] - w(i, N) * X_odd[i];
-                    }
-                }
-                return X;
-
-            });
+            Complex[] x_even = new Complex[N / 2];
+            Complex[] x_odd = new Complex[N / 2];
+            for (int i = 0; i < N / 2; i++)
+            {
+                x_even[i] = x[2 * i];
+                x_odd[i] = x[2 * i + 1];
+            }
+            Complex[] X_even = null, X_odd = null;
+            //Console.WriteLine($"N={N}, {type}");
+            if (N == 4)
+            {
+                X_even = new Complex[2];
+                X_even[0] = x_even[0] + x_even[1];
+                X_even[1] = x_even[0] - x_even[1];
+                X_odd = new Complex[2];
+                X_odd[0] = x_odd[0] + x_odd[1];
+                X_odd[1] = x_odd[0] - x_odd[1];
+            }
+            else
+            {
+                var t1 = Task.Run(() => pfft(x_even, 2));
+                var t2 = Task.Run(() => pfft(x_odd, 1));
+                Task.WaitAll(t1, t2);
+                X_even = t1.Result;
+                X_odd = t2.Result;
+            }
+            X = new Complex[N];
+            for (int i = 0; i < N / 2; i++)
+            {
+                X[i] = X_even[i] + w(i, N) * X_odd[i];
+                X[i + N / 2] = X_even[i] - w(i, N) * X_odd[i];
+            }
+            return X;
         }
 
         public static Complex[] nfft(Complex[] X)

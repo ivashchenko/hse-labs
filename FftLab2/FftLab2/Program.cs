@@ -11,8 +11,10 @@ namespace FftLab2
     {
         static void Main(string[] args)
         {
-            int N = (int)Math.Pow(2, 20);
+            int N = (int)Math.Pow(2, 25);
             Complex[] signal = new Complex[N];
+
+            Console.WriteLine($"Signal N={N}");
 
             for (int t = 0; t < signal.Length; t++)
                 signal[t] = Math.Sin(2 * Math.PI * t / 1000);
@@ -24,9 +26,7 @@ namespace FftLab2
             Console.WriteLine($"1'st: {sw.ElapsedMilliseconds} ms");
 
             sw.Restart();
-            var task = FFT.pfft(signal);
-            Task.WaitAll(task);
-            var spectre2 = task.Result;
+            var spectre2 = FFT.pfft(signal);
             sw.Stop();
             Console.WriteLine($"2'd: {sw.ElapsedMilliseconds} ms");
 
