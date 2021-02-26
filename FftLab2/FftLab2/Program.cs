@@ -21,7 +21,7 @@ namespace FftLab2
 
         static void Main(string[] args)
         {
-            int N = (int)Math.Pow(2, 24);
+            int N = (int)Math.Pow(2, 20);
             Stopwatch sw = new Stopwatch();
 
             Complex[] signal = new Complex[N];
@@ -36,9 +36,14 @@ namespace FftLab2
 
             sw.Restart();
             int forkLevel = (int)Math.Log2(8);
-            var spectre2 = FFT.p2fft(signal, 8);
+            var spectre2 = FFT.p2fft(signal, 4);
             sw.Stop();
             Console.WriteLine($"2'd: {sw.ElapsedMilliseconds} ms");
+
+            sw.Restart();
+            var spectre3 = FFT.pfft(signal, 1, forkLevel);
+            sw.Stop();
+            Console.WriteLine($"3'd: {sw.ElapsedMilliseconds} ms");
 
             Console.WriteLine($"Signals are equal: {spectre1.SequenceEqual(spectre2)}");
         }

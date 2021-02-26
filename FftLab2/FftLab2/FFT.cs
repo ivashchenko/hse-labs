@@ -93,7 +93,7 @@ namespace FftLab2
             return X;
         }
 
-        public static Complex[] p2fft(Complex[] x, int maxThreads)
+        public static Complex[] p2fft(Complex[] x, int maxThreads, int level = 1)
         {
             Complex[] X;
             int N = x.Length;
@@ -111,13 +111,13 @@ namespace FftLab2
                 {
                     x_even[i] = x[2 * i];
                     x_odd[i] = x[2 * i + 1];
+
                 }
-                X = new Complex[N];
                 Complex[] X_even = null, X_odd = null;
-                if (N > 1000)
+                if (false)
                 {
-                    X_even = p2fft(x_even, maxThreads);
-                    X_odd = p2fft(x_odd, maxThreads);
+                    X_even = p2fft(x_even, maxThreads, level + 1);
+                    X_odd = p2fft(x_odd, maxThreads, level + 1);
 
                     Parallel.For(0, maxThreads, p =>
                     {
@@ -134,19 +134,47 @@ namespace FftLab2
                 }
                 else
                 {
-                    Parallel.Invoke(
-                        () => X_even = p2fft(x_even, maxThreads),
-                        () => X_odd = p2fft(x_odd, maxThreads));
-
-                    for (int i = 0; i < N / 2; i++)
+                    if (level <= 2)
                     {
-                        X[i] = X_even[i] + w(i, N) * X_odd[i];
-                        X[i + N / 2] = X_even[i] - w(i, N) * X_odd[i];
+                        int nextlevel = level + 1;
+                        Parallel.Invoke(
+                            () => X_even = p2fft(x_even, maxThreads, nextlevel),
+                            () => X_odd = p2fft(x_odd, maxThreads, nextlevel));
+
+                        X = new Complex[N];
+
+                        Console.WriteLine("done");
+                        Parallel.For(0, maxThreads, p =>
+                        {
+                            int n = N / 2;
+                            int M = n / maxThreads, m = n % maxThreads;
+                            int max = p == maxThreads - 1 ? M + m : M;
+
+                            for (int j = 0, i = p * M; j < max; j++, i++)
+                            {
+                                X[i] = X_even[i] + w(i, N) * X_odd[i];
+                                X[i + N / 2] = X_even[i] - w(i, N) * X_odd[i];
+                            }
+                        });
                     }
+                    else
+                    {
+                        int nextlevel = level + 1;
+                        if (level == 3)
+                            Console.WriteLine($"n={N}");
+
+                        X_even = p2fft(x_even, maxThreads, nextlevel);
+                        X_odd = p2fft(x_odd, maxThreads, nextlevel);
+                        X = new Complex[N];
+                        for (int i = 0; i < N / 2; i++)
+                        {
+                            X[i] = X_even[i] + w(i, N) * X_odd[i];
+                            X[i + N / 2] = X_even[i] - w(i, N) * X_odd[i];
+                        }
+                    }
+
+                    
                 }
-
-                X = new Complex[N];
-
             }
             return X;
         }
