@@ -134,6 +134,13 @@ namespace FftLab2
                 }
                 else
                 {
+                    int myId = 0;
+                    if (level < 4) 
+                    {
+                        myId = Interlocked.Increment(ref counter);
+                        Console.WriteLine($"{myId} ({level}) born {DateTime.Now.Second}:{DateTime.Now.Millisecond}");
+                    }
+
                     if (level <= 2)
                     {
                         int nextlevel = level + 1;
@@ -143,14 +150,13 @@ namespace FftLab2
 
                         X = new Complex[N];
 
-                        Console.WriteLine("done");
-                        Parallel.For(0, maxThreads, p =>
+                        //Console.WriteLine("done");
+                        Parallel.For(0, 2, p =>
                         {
                             int n = N / 2;
-                            int M = n / maxThreads, m = n % maxThreads;
-                            int max = p == maxThreads - 1 ? M + m : M;
+                            int M = n / 2;
 
-                            for (int j = 0, i = p * M; j < max; j++, i++)
+                            for (int j = 0, i = p * M; j < M; j++, i++)
                             {
                                 X[i] = X_even[i] + w(i, N) * X_odd[i];
                                 X[i + N / 2] = X_even[i] - w(i, N) * X_odd[i];
@@ -163,8 +169,12 @@ namespace FftLab2
                         if (level == 3)
                             Console.WriteLine($"n={N}");
 
-                        X_even = p2fft(x_even, maxThreads, nextlevel);
-                        X_odd = p2fft(x_odd, maxThreads, nextlevel);
+                        //X_even = p2fft(x_even, maxThreads, nextlevel);
+                        //X_odd = p2fft(x_odd, maxThreads, nextlevel);
+
+                        X_even = fft(x_even);
+                        X_odd = fft(x_odd);
+
                         X = new Complex[N];
                         for (int i = 0; i < N / 2; i++)
                         {
@@ -172,8 +182,9 @@ namespace FftLab2
                             X[i + N / 2] = X_even[i] - w(i, N) * X_odd[i];
                         }
                     }
-
-                    
+                    string space = " ";
+                    if(myId > 0)
+                        Console.WriteLine($"{space:level}{myId} dead {DateTime.Now.Second}:{DateTime.Now.Millisecond}");
                 }
             }
             return X;
