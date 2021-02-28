@@ -1,0 +1,21 @@
+1'st fft(N=2^24): 8955 ms
+2'd pfft: 4558 ms
+Signals are equal: True, error=0
+3'd fft2(N=2^24): 9131 ms
+Signals are equal: False, error=1,3763609573118265E-06
+4'th pfft2 loop:
+Threads=1 done 9829 ms, signals are equal: True, error = 0
+Threads=2 done 5023 ms, signals are equal: True, error = 0
+Threads=3 done 3441 ms, signals are equal: True, error = 0
+Threads=4 done 2647 ms, signals are equal: True, error = 0
+Threads=5 done 2135 ms, signals are equal: True, error = 0
+Threads=6 done 2043 ms, signals are equal: True, error = 0
+Threads=7 done 2510 ms, signals are equal: True, error = 0
+Threads=8 done 1997 ms, signals are equal: True, error = 0
+Threads=9 done 1851 ms, signals are equal: True, error = 0
+Threads=10 done 1707 ms, signals are equal: True, error = 0
+Threads=11 done 1594 ms, signals are equal: True, error = 0
+Threads=12 done 1504 ms, signals are equal: True, error = 0
+
+D:\GitHub\hse-labs\FftLab2\FftLab2\bin\Release\netcoreapp3.1\FftLab2.exe (процесс 16228) завершил работу с кодом 0.
+Нажмите любую клавишу, чтобы закрыть это окно…

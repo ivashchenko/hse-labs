@@ -50,8 +50,8 @@ namespace FftLab2
             return X;
         }
 
-        // параллельная fft, 2х раза быстрее
-        public static Complex[] pfft(Complex[] x, int level=1, int forkLevel=1)
+        // параллельная fft, до 2х раз быстрее
+        public static Complex[] pfft(Complex[] x, int level = 1, int forkLevel = 1)
         {
             Complex[] X;
             int N = x.Length;
@@ -153,7 +153,8 @@ namespace FftLab2
             int chunk = N / maxThreads;
             Barrier _barrier = new Barrier(maxThreads);
 
-            Parallel.For(0, maxThreads, tid => {
+            Parallel.For(0, maxThreads, tid =>
+            {
 
                 int start = tid * chunk,
                     end = tid == (maxThreads - 1) ? N : (tid + 1) * chunk;

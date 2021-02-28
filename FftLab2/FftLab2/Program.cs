@@ -6,27 +6,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Collections;
+using System.Text;
 
 namespace FftLab2
 {
     class Program
     {
-        static int counter = 0;
-
-        private static Complex w(int k, int N)
-        {
-            if (k % N == 0) return 1;
-            double arg = -2 * Math.PI * k / N;
-            return new Complex(Math.Cos(arg), Math.Sin(arg));
-        }
-
         static double error(Complex[] signal1, Complex[] signal2)
         {
             double res = 0;
             for (int i = 0; i < signal1.Length; i++)
             {
                 double e = (signal1[i] - signal2[i]).Magnitude;
-                res += e*e;
+                res += e * e;
             }
             return Math.Sqrt(res / signal1.Length);
         }
@@ -38,8 +30,8 @@ namespace FftLab2
             Complex[] signal = new Complex[N];
 
             for (int t = 0; t < signal.Length; t++)
-                signal[t] = Math.Sin(2 * Math.PI * t / 1000);
-                //signal[t] = t % 100;
+                signal[t] = Math.Sin(2 * Math.PI * t / (N / 50)) + Math.Sin(2 * Math.PI * t / (N / 100)) / 2;
+            //signal[t] = t % 100;
 
             sw.Restart();
             Complex[] sp1 = FFT.fft(signal);
@@ -66,6 +58,14 @@ namespace FftLab2
                 Complex[] sp4 = FFT.pfft2(signal, i);
                 sw.Stop();
                 Console.WriteLine($"Threads={i} done {sw.ElapsedMilliseconds} ms, signals are equal: {sp1.SequenceEqual(sp2)}, error = {error(sp3, sp4)}");
+            }
+
+            if (P < 10)
+            {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < N; i++)
+                    sb.AppendLine($"{signal[i].Real};{sp1[i].Magnitude};{sp3[i].Magnitude}");
+                System.IO.File.WriteAllText("fft-analysis.csv", sb.ToString());
             }
         }
     }
