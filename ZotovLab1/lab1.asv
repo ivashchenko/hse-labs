@@ -4,18 +4,16 @@ t = 0:T:100*T;
 f = sin(2*pi*500*t) + sin(2*pi*1000*t)/2;
 plot(t,f);
 
-%--- Задача Зотова найти дисперсию (мощность сигнала - как АКФ в нуле
-sum(f.*f)
-f_corr = xcorr(f)
-max(f_corr)
-plot(f_corr)
+%--- Задача Зотова найти 
+
+plot(xcorr(f))
 
 F = abs(fft([f zeros(size(f))]))
 S = F.*F
 R = fftshift(ifft(S))
+
 plot(R)
-R(102)
-return
+R(101)
 %--- thr end
 
 Ck = zeros(size(t));
