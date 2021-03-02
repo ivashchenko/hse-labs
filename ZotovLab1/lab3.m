@@ -16,18 +16,19 @@ for (i=3:1:N_signal)
     ar(i)=0.7*ar(i-1)-0.2*ar(i-2)+0.1*randn(1);
 end;
 
-plot(ar);
+plot(ar, ':');
+legend({'Сгенерированный шум'},'Location','southwest')
 
 %making a sum
-signal=ar;%garm+
-
+signal=garm+ar;%garm+
 plot(signal);
+legend({'Исходный сигнал + шум'},'Location','southwest')
 %--------------------------------------------------------------------------
 %-------------
 
 %output to the file
 %chnage the path
-cd 'd:/Р¤РёР»СЊС‚СЂР°С†РёСЏ';
+%cd 'd:/Р¤РёР»СЊС‚СЂР°С†РёСЏ';
 fout=fopen('signal.dat','wt');
 for(i=1:1:N_signal)
  fprintf(fout,'%12.6f%12.6f\n',i,signal(i)); 
