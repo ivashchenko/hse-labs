@@ -1,4 +1,52 @@
 % program is improved 14.02.2011 by L.V. Zotov
+clc; 
+clear;
+N=99;
+f = mod([1:N],10)-5 + randn([1,N]);
+f(1:N/10) = 0;
+f(9*N/10:N) = 0;
+plot(f)
+
+window = 3;
+h = zeros(size(f));
+h(1: window) = 1/window;
+h = fftshift(h);
+
+h2 = repmat([1/window], 1, window);
+f_ma = conv(f, h2);
+f_ma = f_ma(1:end-window);
+
+F = fft(f);
+H = fft(h);
+f2 = fftshift(ifft(F.*H));
+
+tiledlayout(3,2)
+nexttile;
+plot(f);
+legend({'Исходный сигнал'},'Location','southwest')
+nexttile;
+plot(abs(F))
+legend({'Спектр сигнала'},'Location','southwest')
+
+nexttile;
+plot(h)
+legend({'Импульсная х-ка фильтра'},'Location','southwest')
+nexttile;
+plot(abs(h))
+legend({'Частотная х-ка фильтра'},'Location','southwest')
+
+nexttile;
+plot(f_ma);
+legend({'Свёртка: ОКНО 3'},'Location','southwest')
+nexttile;
+plot(f2);
+legend({'Умнож спектров'},'Location','southwest')
+
+return
+
+
+
+% program is improved 14.02.2011 by L.V. Zotov
 clear;
 
 %--------- Part 1---------------------
