@@ -30,10 +30,10 @@ signal=garm+ar;
 plot(signal);
 
 
-cd C:\work\course\filtr\eng\Lab4;
+%cd C:\work\course\filtr\eng\Lab4;
 
-savefile = 'signal.mat';
-save(savefile,'signal');
+%savefile = 'signal.mat';
+%save(savefile,'signal');
 
 %------------------------------------------------
 a_max=128;
