@@ -84,7 +84,21 @@ for(tau=1:1:N_signal)
 end;
 plot(acf);
 
+clf;
+tiledlayout(2,1)
+nexttile;
 plot(acf(1:254));
+nexttile;
+
+F = abs(fft([signal zeros(size(signal))]))
+S = F.*F
+acf2 = fftshift(ifft(S))/N_signal
+
+acf3 = xcorr(signal)/N_signal
+idx = find(acf2 == max(acf2))
+acf2 = acf2(idx: idx+254)
+
+plot(acf2(1:254)-acf3(1:254));
 
 %--------------------------------------------------------------------------------------------------
 
