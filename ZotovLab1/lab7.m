@@ -1,136 +1,45 @@
-% part 4 - my signal
-T = 1/10000;  % 0.1 мс
-t = 0:T:100*T;
-f = sin(2*pi*500*t) + sin(2*pi*1000*t)/2;
-plot(t,f);
+% Фильтрация сигнала «фильтром Пантелеева»
+clc; clear; 
+N=1024;
+Fd = 10000; % частота дискретизации 10 кГц
+Td = 1/Fd; % период дискретизации, c
 
-%--- Задача Зотова найти дисперсию (мощность сигнала - как АКФ в нуле
-sum(f.*f)
-f_corr = xcorr(f)
-max(f_corr)
-plot(f_corr)
+% соберём фильтр верхних частот с частотой среза 4 кГц
+N2 = N/2 - 1;
+w0 = 2*pi*4000;
+w = 2*pi*Fd*[0:N2]/N2;
+H = j*w ./ (j*w+w0);
+H = H .* H;
+H = [H flip(H)]; % ФВЧ 2-го порядка
 
-F = abs(fft([f zeros(size(f))]))
-S = F.*F
-R = fftshift(ifft(S))
-plot(R)
-R(102)
-return
-%--- thr end
+f = 2*randn([1,N]); % чистый шум
+F = fft(f) .* H; % отфильтруем шум
+plot(abs(F)); % спектр шума
 
-Ck = zeros(size(t));
-N = length(t);
-% реализуем ДПФ "самостоятельно" ;)
-for k = 1: N
-  for i = 1: N
-    Ck(k) = Ck(k) + f(i)*exp(-j*2*pi*k*i/N);
-  end
-  Ck(k) = Ck(k) / N;
-end
+t=[0:N-1];
+f = real(ifft(F)) + 0.3*sin(2*pi*t/20) + sin(2*2*pi*(t+20)/20);
+f = 0.3*sin(2*pi*t/20) + sin(2*2*pi*(t+20)/20); % без шума
+plot(f(1:100))  % исходный сигнал 
+F = fft(f); % спектр сигнала с шумом
+plot(abs(fftshift(F))); 
 
-Ck = fftshift(Ck)
+% способ 1. через имульсную характеристику фильтра
+W0 = 2*pi*2000; % частота среза фильтра 2 кГц
+td = Td * [-N/2+1:N/2];
+W0 = W0/ sqrt(2);
+h = W0 * exp(-W0 * abs(td)) .* (cos(W0 * td) + sin(W0 * abs(td))) / 2;
+%h = h / Fd;
+plot(h(4*N/10:6*N/10))
+H = fft(h);
+plot(abs(fftshift(H)/N))
 
-f = [-N/2+1:N/2] ./ max(t);
-%f = [0:N-1] ./ max(t);
-plot(f, abs(Ck));
-return
+% фильтрация фильтром Пантелеева сигнала с шумом 
+F2 = F .* H;
+f2 = fftshift(ifft(F2/N));
+plot(f2(1:100))
 
-% program is improved 14.02.2011 by L.V. Zotov
-clear;
+% способ 2. через свёртку
+hc = nonzeros(h)';
+f_ma = conv(f, hc); % свёртка сигнала с импульсной хар-кой
+plot(f_ma(N/2:4*N/3));
 
-
-%--------- Part 1---------------------
-% fft of artificial signal
-
-N_signal=1024;
-% generating two-sin signal
-%for (k=1:1:N_signal)
-%    signal(k)=sin(2*pi/10*(k-1))+sin(2*pi/100*(k-1));
-%end;
-
-k=1:1:N_signal;
-signal=sin(2*pi/10*(k-1))+sin(2*pi/100*(k-1));
-
-% try to add noise with Coef*randn([1,N_signal])
-
-plot(signal);
-
-%fast Fourier transform calculation
-
-Ftrns_signal=fft(signal);
-
-%amplitude spectrum calculation
-apl_spectrum=abs(Ftrns_signal);
-
-plot(apl_spectrum);
-
-return
-%----------- Part 2-----------------------------------------
-% download file http://hpiers.obspm.fr/iers/eop/eopc01/eopc01.1900-now.dat
-% to the folder (change if needed):
-% cd C:\work\course\filtr\eng\Lab1;
-
-fin=fopen('eopc01.1900-now.dat','rt');
-fgetl(fin);
-A=fscanf(fin,'%f',[11 inf]);% A - array of data
-fclose(fin);
-
-%determining the size of the signal
-l=size(A);
-N=l(2);
-
-%selecting the rows of the Array
-Date=A(1,1:N);
-X_pole=A(2,1:N);
-Y_pole=A(4,1:N);
-dt=Date(2)-Date(1);
-
-plot(Date(2:N)-Date(1:N-1))
-
-plot3(X_pole,Y_pole,Date)
-
-plot(X_pole);
-
-%selecting the length of the part of the signal will be trasformed
-N_ft=N;
-%fast Fourier transform calculation
-Ftrns_X=fft(X_pole,N_ft);
-
-
-% frequency calculation
-% for the half of the spectrum not counting 1 coefficient - an avarage
-% N_ft is odd or even - ? 
-N_half=round((N_ft-1)/2);
-freq=(1:N_half)/N_ft/dt;
-
-%amplitude spectrum calculation
-
-ampl_spectrum_X=abs(Ftrns_X)/N_ft;
-
-% we plot spectrum multiplied by two to take into account energy in the
-% second part
-plot(freq, 2*ampl_spectrum_X(2:N_half+1));
-title('amplitude spectrum - module of Fourier-transformation ')
-xlabel('frequency')
-
-% periods=1./freq;
-% plot(periods, 2*apl_spectrum_X(2:N_half+1));
-% title('periodogramm')
-% xlabel('frequency')
-% 
-
-
-%------------ now let's calculate the complex spectrum
-%functions path
- %  slow Fourier transform    
-addpath( './functions')
-XY=X_pole-i*Y_pole;
-[ spectrXY, freqXY] = spect_fftn(Date,XY);
-
-plot(freqXY', abs(spectrXY)')   
-title('amplitude spectrum - module of Fourier-transformation ')
-xlabel('frequency, cycles per year')
-
-
-
-%Co L.V. Zotov
